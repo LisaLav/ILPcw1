@@ -1,6 +1,28 @@
 package uk.ac.ed.inf;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 public record LngLat(double longitude, double latitude) {
+
+    private static JSONPoint[] getCentralAreaPoints(String url){
+        ObjectMapper mapper = new ObjectMapper();
+        JSONPoint[] centralAreaPoints = null;
+
+        try{
+            URL jsonUrl = new URL(url + "centralArea");
+            centralAreaPoints = mapper.readValue(jsonUrl, JSONPoint[].class);
+
+        } catch(MalformedURLException e){
+            e.printStackTrace();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+
+        return centralAreaPoints;
+    }
 
     public LngLat{
         if (longitude >= 0 || latitude <= 0){
@@ -8,12 +30,14 @@ public record LngLat(double longitude, double latitude) {
         }
     }
 
-    public boolean inCentralArea(){
-        //replace values with constants of predefined places
-        if (-3.192473 <= longitude && longitude <= -3.184319 && 55.942617 <= latitude && latitude <= 55.946233){
-            return true;
-        }
-        return false;
+    public static boolean inCentralArea(){
+
+        CentralArea centralArea = CentralArea.getInstance(null);
+        JSONPoint[] centralAreaPoints = getCentralAreaPoints(centralArea.getUrl());
+
+
+
+        return true;
     }
 
     public double distanceTo(LngLat coordsTo){
@@ -28,8 +52,8 @@ public record LngLat(double longitude, double latitude) {
         return false;
     }
 
-    public LngLat nextPosition(double compass){
-
+    public LngLat nextPosition(double degree){
+        return null;
     }
 
 }
