@@ -8,9 +8,9 @@ public class JSONPoint {
     public String name;
 
     @JsonProperty("longitude")
-    public float longitude;
+    public double longitude;
 
     @JsonProperty("latitude")
-    public float latitude;
+    public double latitude;
 
 }

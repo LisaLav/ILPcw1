@@ -30,14 +30,16 @@ public record LngLat(double longitude, double latitude) {
         }
     }
 
-    public static boolean inCentralArea(){
+    public boolean inCentralArea(){
 
         CentralArea centralArea = CentralArea.getInstance(null);
         JSONPoint[] centralAreaPoints = getCentralAreaPoints(centralArea.getUrl());
 
+        if (WindingNumber.isInPolygon(this, centralAreaPoints, centralAreaPoints.length)){
+            return true;
+        }
 
-
-        return true;
+        return false;
     }
 
     public double distanceTo(LngLat coordsTo){
@@ -52,8 +54,27 @@ public record LngLat(double longitude, double latitude) {
         return false;
     }
 
-    public LngLat nextPosition(double degree){
-        return null;
+    public LngLat nextPosition(CompassDirection direction){
+
+        LngLat newPosition;
+        double degree;
+        double moveDistance = 0.00015;
+
+        //hover motion
+        if (direction == null){
+            newPosition = this;
+        } else{
+
+            degree = direction.getDegree();
+            double newLatitude = Math.sin(degree)*moveDistance;
+            double newLongitude = Math.cos(degree)*moveDistance;
+
+            newPosition = new LngLat(newLongitude,newLatitude);
+
+        }
+
+        return newPosition;
+
     }
 
 }
