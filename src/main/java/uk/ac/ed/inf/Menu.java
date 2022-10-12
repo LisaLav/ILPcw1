@@ -4,7 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Menu {
 
+    @JsonProperty("name")
     public String name;
+    @JsonProperty("priceInPence")
     public int priceInPennies;
+
+    public String getName(){ return name; }
 
 }

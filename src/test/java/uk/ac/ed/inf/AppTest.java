@@ -104,24 +104,13 @@ public class AppTest
     }
 
     @Test
-    public void testRestaurantGetMenu(){
+    public void testRestaurantGetRestaurants() throws MalformedURLException {
 
-        ObjectMapper mapper = new ObjectMapper();
-        Restaurant[] restaurantList = null;
+        URL url = new URL("https://ilp-rest.azurewebsites.net/" + "restaurants");
 
-        try{
-            URL restaurantUrl = new URL("https://ilp-rest.azurewebsites.net/" + "restaurants");
-            restaurantList = mapper.readValue(restaurantUrl, Restaurant[].class);
+        Restaurant[] things = Restaurant.getRestaurantsFromRestServer(url);
 
-        } catch(MalformedURLException e){
-            e.printStackTrace();
-        } catch (IOException e){
-            e.printStackTrace();
-        }
-
-        Menu[] menus = restaurantList[0].getMenu();
-
-        System.out.println(menus);
+       // System.out.println(things[2].getMenu()[1].getName());
 
     }
 }
