@@ -66,8 +66,8 @@ public record LngLat(double longitude, double latitude) {
         } else{
 
             degree = direction.getDegree();
-            double newLatitude = Math.sin(degree)*moveDistance;
-            double newLongitude = Math.cos(degree)*moveDistance;
+            double newLatitude = latitude + Math.sin(degree)*moveDistance;
+            double newLongitude = longitude + Math.cos(degree)*moveDistance;
 
             newPosition = new LngLat(newLongitude,newLatitude);
 
