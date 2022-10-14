@@ -1,5 +1,10 @@
 package uk.ac.ed.inf;
 
+/**
+ * An enumeration for each of the directions the drone can move in
+ * Has 16 compass directions, each of which relate to a specific degree it is equal to
+ * East starts off at 0, then North is 90, etc.
+ */
 public enum CompassDirection {
 
     N(90),
@@ -19,12 +24,23 @@ public enum CompassDirection {
     NW(135),
     NNW(112.5);
 
+    /**
+     * The degree of a compass direction
+     */
     private double degree;
 
+    /**
+     * Sets the degree for each of the enumerations
+     * @param degree degree of compass direction
+     */
     CompassDirection(double degree){
         this.degree = degree;
     }
 
+    /**
+     * Returns degree of the direction
+     * @return degree
+     */
     public double getDegree(){
         return degree;
     }

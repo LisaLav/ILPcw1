@@ -182,12 +182,12 @@ public class AppTest
 
         order.add("Meat Lover");
         order.add("Vegan Delight");
-        order.add("Pineapple & Ham & Cheese");
-        order.add("Super Cheese");
+        order.add("Meat Lover");
+        order.add("Meat Lover");
 
         int cost = Order.getDeliveryCost(things,order);
 
-        assertEquals(4900, cost);
+        assertEquals(5400, cost);
 
     }
 
@@ -246,6 +246,21 @@ public class AppTest
         int cost = Order.getDeliveryCost(things,order);
 
         System.out.println(order.isEmpty());
+
+    }
+
+    @Test (expected = InvalidPizzaCombinationException.class)
+    public void testGetDeliveryCostMultipleRestaurants() throws MalformedURLException {
+
+        URL url = new URL("https://ilp-rest.azurewebsites.net/" + "restaurants");
+
+        Restaurant[] things = Restaurant.getRestaurantsFromRestServer(url);
+        ArrayList<String> order = new ArrayList<String>();
+
+        order.add("Super Cheese");
+        order.add("Calzone");
+
+        int cost = Order.getDeliveryCost(things,order);
 
     }
 
