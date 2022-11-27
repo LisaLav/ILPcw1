@@ -1,6 +1,7 @@
 package uk.ac.ed.inf;
 
 import uk.ac.ed.inf.exceptions.InvalidPizzaCombinationException;
+import uk.ac.ed.inf.jsons.Menu;
 import uk.ac.ed.inf.records.Restaurant;
 
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public class Order {
      * This sets up the menuItems and restaurantPizzas Hashmaps using the passed in parameter
      * @param restaurants the list of participating restaurants
      */
-    private static void setUpMenuItems(Restaurant[] restaurants){
+    public static void setUpMenuItems(Restaurant[] restaurants){
 
         //loop through the array of restaurants to obtain the relevant menu list & restaurant
         for (int i = 0; i < restaurants.length; i++){

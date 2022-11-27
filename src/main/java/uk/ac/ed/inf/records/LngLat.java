@@ -2,7 +2,7 @@ package uk.ac.ed.inf.records;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.ac.ed.inf.enums.CompassDirection;
-import uk.ac.ed.inf.JSONPoint;
+import uk.ac.ed.inf.jsons.JSONPoint;
 import uk.ac.ed.inf.RESTUrl;
 import uk.ac.ed.inf.algorithms.WindingNumber;
 

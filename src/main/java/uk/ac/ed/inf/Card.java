@@ -1,5 +1,7 @@
 package uk.ac.ed.inf;
 
+import uk.ac.ed.inf.algorithms.Luhns;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -43,7 +45,7 @@ public class Card {
 
     private static boolean checkCardNumber(String cardNumber){
 
-        boolean isValid;
+        boolean isValid = false;
         String regex = "^[0-9]{16}$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(cardNumber);
@@ -56,22 +58,30 @@ public class Card {
 
         //check if valid with mastercard
         if (51 <= cardType && cardType <= 55){
-
+            if (Luhns.validateCardNumber(cardNumber)){
+                isValid = true;
+            }
         }
 
         cardType = Integer.parseInt(cardNumber.substring(0,4));
 
         //also if valid with mastercard
         if (2221 <= cardType && cardType <= 2720){
-
+            if (Luhns.validateCardNumber(cardNumber)){
+                isValid = true;
+            }
         }
 
         cardType = Integer.parseInt(cardNumber.substring(0,1));
 
         //check if valid with visa
         if (cardType == 4){
-
+            if (Luhns.validateCardNumber(cardNumber)){
+                isValid = true;
+            }
         }
+
+        return isValid;
 
     }
 
@@ -92,12 +102,8 @@ public class Card {
             return false;
         }
 
-        //check if card is past expiry date
-        if (checkExpiryDate(expiryDate)){
-            isValid = true;
-        } else if (checkCVV(cvv)) {
-            isValid = true;
-        } else if (checkCardNumber(cvv)){
+        //check that card is valid
+        if (checkExpiryDate(expiryDate) && checkCVV(cvv) && checkCardNumber(cardNumber)){
             isValid = true;
         }
 

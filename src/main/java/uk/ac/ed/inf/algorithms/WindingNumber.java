@@ -1,6 +1,6 @@
 package uk.ac.ed.inf.algorithms;
 
-import uk.ac.ed.inf.JSONPoint;
+import uk.ac.ed.inf.jsons.JSONPoint;
 import uk.ac.ed.inf.records.LngLat;
 
 /**

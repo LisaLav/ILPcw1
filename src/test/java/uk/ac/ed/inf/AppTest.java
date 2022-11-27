@@ -4,6 +4,7 @@ import org.junit.Test;
 import uk.ac.ed.inf.algorithms.WindingNumber;
 import uk.ac.ed.inf.enums.CompassDirection;
 import uk.ac.ed.inf.exceptions.InvalidPizzaCombinationException;
+import uk.ac.ed.inf.jsons.JSONPoint;
 import uk.ac.ed.inf.records.LngLat;
 import uk.ac.ed.inf.records.Restaurant;
 
@@ -84,6 +85,9 @@ public class AppTest
     @Test
     public void testLngLatInCentralAreaTrue(){
 
+        String url = "https://ilp-rest.azurewebsites.net/";
+        RESTUrl.getInstance(url);
+
         LngLat centralPoint = new LngLat(-3.185,55.944);
 
         assertTrue(centralPoint.inCentralArea());
@@ -115,6 +119,9 @@ public class AppTest
     @Test
     public void testLngLatInCentralAreaFalse(){
 
+        String url = "https://ilp-rest.azurewebsites.net/";
+        RESTUrl.getInstance(url);
+
         LngLat outsidePoint = new LngLat(-4, 3000);
 
         assertFalse(outsidePoint.inCentralArea());
@@ -124,6 +131,9 @@ public class AppTest
     @Test
     public void testLngLatInCentralAreaOnBoundary(){
 
+        String url = "https://ilp-rest.azurewebsites.net/";
+        RESTUrl.getInstance(url);
+
         LngLat boundaryPoint = new LngLat(-3.192473,55.946233);
 
         assertTrue(boundaryPoint.inCentralArea());
@@ -132,6 +142,9 @@ public class AppTest
 
     @Test
     public void testLngLatInCentralAreaCornerPoint(){
+
+        String url = "https://ilp-rest.azurewebsites.net/";
+        RESTUrl.getInstance(url);
 
         LngLat boundaryPoint = new LngLat(-3.192473,55.946233);
 
@@ -158,6 +171,7 @@ public class AppTest
         Restaurant[] things = Restaurant.getRestaurantsFromRestServer(url);
 
         Order.setUpMenuItems(things);
+        System.out.println(things[0].getMenu()[1].getName());
 
     }*/
 

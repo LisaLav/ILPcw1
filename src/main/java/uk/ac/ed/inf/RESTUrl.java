@@ -16,19 +16,10 @@ public final class RESTUrl {
     private String url;
 
     /**
-     * A method for if a url is not passed in when starting the program
-     */
-    private RESTUrl() {
-        this.url = "https://ilp-rest.azurewebsites.net/";
-    }
-
-    /**
      * A method for when a url is passed in when starting the program
      * @param url the base url for the REST server
      */
-    private RESTUrl(String url){
-        this.url = url;
-    }
+    private RESTUrl(String url){ this.url = url; }
 
     /**
      * getInstance makes sure to only ever have one instance of the RESTUrl class active, acting as a singleton
@@ -39,11 +30,7 @@ public final class RESTUrl {
 
         //if the restUrl doesn't exist yet then no instance of RESTUrl exists
         if (restUrl == null){
-            if (url != null){
-                restUrl = new RESTUrl(url);
-            } else{
-                restUrl = new RESTUrl();
-            }
+            restUrl = new RESTUrl(url);
         }
 
         return restUrl;

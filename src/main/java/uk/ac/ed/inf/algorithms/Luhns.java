@@ -4,22 +4,22 @@ public class Luhns {
 
     public static boolean validateCardNumber(String cardNumber){
 
+        boolean isValid = false;
         int sum = 0;
         char checkDigit = cardNumber.charAt(15);
-        //hard coding in 15 as all card numbers are of length 15, and need to drop off last digit
-        cardNumber = cardNumber.substring(0,15);
-        int[] doubledDigits = {0, 0, 0, 0, 0, 0, 0};
+        int[] doubledDigits = {0, 0, 0, 0, 0, 0, 0, 0};
+        int j = 0;
 
         //calculate the sum for Luhn
-        for (int i=cardNumber.length()-1; i >= 0; i = i-2){
+        for (int i=cardNumber.length()-2; i >= 0; i = i-2){
 
+            int cardInt = Integer.parseInt(String.valueOf(cardNumber.charAt(i)));
 
+            doubledDigits[j] = cardInt * 2;
 
-            doubledDigits[i%2] = Integer.parseInt(String.valueOf(cardNumber.charAt(i))) * 2;
-
-            if (i != 0){
-                sum += Integer.parseInt(String.valueOf(cardNumber.charAt(i)));
-            }
+            //need to add on the integers we skip without doubling them to the total sum
+            sum += Integer.parseInt(String.valueOf(cardNumber.charAt(i+1)));
+            j++;
 
         }
 
@@ -36,6 +36,9 @@ public class Luhns {
 
         }
 
+        isValid = (sum % 10) == 0;
+
+        return isValid;
     }
 
 }

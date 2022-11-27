@@ -1,4 +1,4 @@
-package uk.ac.ed.inf;
+package uk.ac.ed.inf.jsons;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -19,11 +19,5 @@ public class Menu {
      */
     @JsonProperty("priceInPence")
     public int priceInPennies;
-
-    /**
-     * Get name of menu item
-     * @return name of menu item
-     */
-    public String getName(){ return name; }
 
 }

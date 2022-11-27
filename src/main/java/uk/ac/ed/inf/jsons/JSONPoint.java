@@ -1,4 +1,4 @@
-package uk.ac.ed.inf;
+package uk.ac.ed.inf.jsons;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
