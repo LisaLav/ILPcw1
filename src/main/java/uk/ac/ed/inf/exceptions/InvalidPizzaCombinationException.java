@@ -1,4 +1,4 @@
-package uk.ac.ed.inf;
+package uk.ac.ed.inf.exceptions;
 
 /**
  * Exists to throw a custom exception for orders that do not follow the guidelines

@@ -1,4 +1,4 @@
-package uk.ac.ed.inf;
+package uk.ac.ed.inf.enums;
 
 /**
  * An enumeration for each of the directions the drone can move in

@@ -1,6 +1,8 @@
-package uk.ac.ed.inf;
+package uk.ac.ed.inf.records;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import uk.ac.ed.inf.Menu;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;

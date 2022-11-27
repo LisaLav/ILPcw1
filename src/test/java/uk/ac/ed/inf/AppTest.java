@@ -1,6 +1,12 @@
 package uk.ac.ed.inf;
 
 import org.junit.Test;
+import uk.ac.ed.inf.algorithms.WindingNumber;
+import uk.ac.ed.inf.enums.CompassDirection;
+import uk.ac.ed.inf.exceptions.InvalidPizzaCombinationException;
+import uk.ac.ed.inf.records.LngLat;
+import uk.ac.ed.inf.records.Restaurant;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;

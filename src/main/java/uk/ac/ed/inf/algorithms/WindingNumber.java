@@ -1,4 +1,7 @@
-package uk.ac.ed.inf;
+package uk.ac.ed.inf.algorithms;
+
+import uk.ac.ed.inf.JSONPoint;
+import uk.ac.ed.inf.records.LngLat;
 
 /**
  * WindingNumber is an algorithm that calculates whether a point is contained by a polygon

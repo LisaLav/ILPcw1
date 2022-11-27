@@ -1,5 +1,8 @@
 package uk.ac.ed.inf;
 
+import uk.ac.ed.inf.exceptions.InvalidPizzaCombinationException;
+import uk.ac.ed.inf.records.Restaurant;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -16,7 +19,7 @@ public class Order {
     /**
      * A Hashmap that maps all the potential menu items to the restaurant they belong to
      */
-    private static HashMap<String,Restaurant> restaurantPizzas = new HashMap<String,Restaurant>();
+    private static HashMap<String, Restaurant> restaurantPizzas = new HashMap<String,Restaurant>();
 
     /**
      * This sets up the menuItems and restaurantPizzas Hashmaps using the passed in parameter
@@ -50,7 +53,7 @@ public class Order {
      * It adds on the cost for the individual pizzas, and only allows orders to order from one restaurant
      * Checks that the order is also valid
      * @param restaurants list of participating restaurants
-     * @param order the order the customer wants
+     * @param order the order of pizzas the customer wants
      * @return the price of the total delivery
      * @throws InvalidPizzaCombinationException whenever the order doesn't follow the guidelines for an order
      * @throws NullPointerException if we try to enter the loop and the order is empty
