@@ -2,6 +2,7 @@ package uk.ac.ed.inf;
 
 import org.junit.Test;
 import uk.ac.ed.inf.algorithms.Luhns;
+import uk.ac.ed.inf.jsons.OrderStructure;
 
 import java.util.ArrayList;
 
@@ -10,12 +11,38 @@ import static org.junit.Assert.*;
 public class OrderTests {
 
     @Test
+    public void testOrderGetDayOrders(){
+
+        String url = "https://ilp-rest.azurewebsites.net/";
+        RESTUrl.getInstance(url);
+
+        String date = "2023-05-30";
+        OrderStructure[] orders = Order.getDayOrders(date);
+
+        System.out.println(orders.length);
+
+    }
+
+    @Test
+    public void testCardCheckCreditCardGood(){
+
+        ArrayList<String> cardDetails = new ArrayList<String>();
+
+        cardDetails.add("4216153867511288");
+        cardDetails.add("0323");
+        cardDetails.add("123");
+
+        assertTrue(Card.checkCreditCard(cardDetails));
+
+    }
+
+    @Test
     public void testCardCheckCreditCardBadNumberNull(){
 
         ArrayList<String> cardDetails = new ArrayList<String>();
 
         cardDetails.add("");
-        cardDetails.add("03/09");
+        cardDetails.add("03/50");
         cardDetails.add("123");
 
         assertFalse(Card.checkCreditCard(cardDetails));

@@ -2,7 +2,7 @@ package uk.ac.ed.inf;
 
 import uk.ac.ed.inf.algorithms.Luhns;
 
-import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.time.format.DateTimeFormatter;
@@ -13,16 +13,11 @@ import java.util.regex.*;
  */
 public class Card {
 
-    /**
-     * A formatter for converting the expiry date in an order (of type String) to LocalDate type
-     */
-    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yy");
-
-    private static boolean checkExpiryDate(LocalDate expiryDate){
+    private static boolean checkExpiryDate(YearMonth expiryDate){
 
         boolean isValid;
 
-        isValid = !expiryDate.isBefore(LocalDate.now());
+        isValid = !expiryDate.isBefore(YearMonth.now());
 
         return isValid;
 
@@ -85,26 +80,33 @@ public class Card {
 
     }
 
-    public static boolean checkCreditCard(ArrayList<String> cardDetails){
+    public static int checkCreditCard(ArrayList<String> cardDetails){
 
-        boolean isValid = false;
-        LocalDate expiryDate = null;
+        int isValid = 0;
+        YearMonth expiryDate = null;
         String cvv = cardDetails.get(2);
         String cardNumber = cardDetails.get(0);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMyy");
 
-        if ((cvv == null) || (cardNumber == null)){
-            return false;
+        if ((cvv == null) || !checkCVV(cvv)){
+            isValid = 1;
+            return isValid;
         }
 
         try{
-            expiryDate = LocalDate.parse(cardDetails.get(1), formatter);
+            expiryDate = YearMonth.parse(cardDetails.get(1), formatter);
         } catch(DateTimeParseException e){
-            return false;
+            isValid = 2;
+            return isValid;
         }
 
         //check that card is valid
-        if (checkExpiryDate(expiryDate) && checkCVV(cvv) && checkCardNumber(cardNumber)){
-            isValid = true;
+        if (!checkExpiryDate(expiryDate)){
+            isValid = 2;
+            return isValid;
+        } else if (!checkCardNumber(cardNumber)){
+            isValid = 3;
+            return isValid;
         }
 
         return isValid;

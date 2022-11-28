@@ -1,6 +1,8 @@
 package uk.ac.ed.inf;
 
 import org.apache.commons.validator.routines.UrlValidator;
+
+import java.net.MalformedURLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.time.format.DateTimeFormatter;
@@ -40,6 +42,13 @@ public class App
         //ensure date is valid
         if (convertDate(date) == null){
             System.out.println("Invalid date put in. Format is YYYY-MM-DD");
+            exit(1);
+        }
+
+        try {
+            Drone.StartDay(date);
+        } catch (MalformedURLException e){
+            System.out.println("Malformed URL Excpetion when starting Drone");
             exit(1);
         }
 

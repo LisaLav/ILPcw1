@@ -13,7 +13,7 @@ public final class RESTUrl {
     /**
      * The base url to the REST server
      */
-    private String url;
+    private static String url;
 
     /**
      * A method for when a url is passed in when starting the program
@@ -41,8 +41,8 @@ public final class RESTUrl {
      * Returns the url
      * @return the REST url
      */
-    public String getUrl(){
-        return this.url;
+    public static String getUrl(){
+        return url;
     }
 
 }

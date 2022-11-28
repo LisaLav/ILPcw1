@@ -43,6 +43,14 @@ public record LngLat(double longitude, double latitude) {
 
     }
 
+    private static JSONPoint[] getNoFlyZones(String url){
+
+        JSONPoint[] noFlyZones = null;
+
+        return noFlyZones;
+
+    }
+
     /**
      * This is here to prevent any coordinates being made that aren't in the rough Edinburgh area
      * @param longitude longitude of coordinate
@@ -63,9 +71,7 @@ public record LngLat(double longitude, double latitude) {
      */
     public boolean inCentralArea(){
 
-        //temporarily have the url = null as there is no base url at the moment
-        RESTUrl restUrl = RESTUrl.getInstance(null);
-        JSONPoint[] centralAreaPoints = getCentralAreaPoints(restUrl.getUrl());
+        JSONPoint[] centralAreaPoints = getCentralAreaPoints(RESTUrl.getUrl());
 
         //use the WindingNumber class to check if the LngLat is in the central area boundary
         if (WindingNumber.isInPolygon(this, centralAreaPoints, centralAreaPoints.length)){
@@ -73,6 +79,18 @@ public record LngLat(double longitude, double latitude) {
         }
 
         return false;
+    }
+
+    public boolean inNoFlyZone(){
+
+        JSONPoint[] noFlyZonePoints = getNoFlyZones(RESTUrl.getUrl());
+
+        if (WindingNumber.isInPolygon(this, noFlyZonePoints, noFlyZonePoints.length)){
+            return true;
+        }
+
+        return false;
+
     }
 
     /**
