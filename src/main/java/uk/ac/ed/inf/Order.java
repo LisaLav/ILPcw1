@@ -6,7 +6,6 @@ import uk.ac.ed.inf.exceptions.InvalidPizzaCombinationException;
 import uk.ac.ed.inf.exceptions.InvalidPizzaCombinationMultipleSuppliers;
 import uk.ac.ed.inf.exceptions.InvalidPizzaCount;
 import uk.ac.ed.inf.exceptions.InvalidPizzaNotDefined;
-import uk.ac.ed.inf.jsons.JSONPoint;
 import uk.ac.ed.inf.jsons.Menu;
 import uk.ac.ed.inf.jsons.OrderStructure;
 import uk.ac.ed.inf.records.Restaurant;
@@ -197,6 +196,10 @@ public class Order {
 
         return cost;
 
+    }
+
+    public static Restaurant getPizzaRestaurant(String pizza){
+        return restaurantPizzas.get(pizza);
     }
 
 }

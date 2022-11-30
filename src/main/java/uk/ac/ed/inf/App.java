@@ -1,6 +1,7 @@
 package uk.ac.ed.inf;
 
 import org.apache.commons.validator.routines.UrlValidator;
+import uk.ac.ed.inf.records.LngLat;
 
 import java.net.MalformedURLException;
 import java.time.LocalDate;

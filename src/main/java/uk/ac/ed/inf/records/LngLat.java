@@ -18,6 +18,9 @@ import java.net.URL;
  */
 public record LngLat(double longitude, double latitude) {
 
+    private static double droneMovement = 0.00015;
+    private static double distanceTolerance = 0.00015;
+
     /**
      * getCentralAreaPoints connects to the REST server and obtains the coordinates of the up-to-date central area
      * @param url the base url for the REST server
@@ -114,11 +117,27 @@ public record LngLat(double longitude, double latitude) {
     public boolean closeTo(LngLat coordsTo){
 
         //calculate using distanceTo
-        if (distanceTo(coordsTo) < 0.00015){
+        if (distanceTo(coordsTo) < distanceTolerance){
             return true;
         }
 
         return false;
+
+    }
+
+    public LngLat[] getNeighbours(){
+
+        LngLat[] neighbours = new LngLat[16];
+        LngLat neighbour = null;
+
+        for (int i = 0; i < neighbours.length; i++){
+
+            neighbour = nextPosition(CompassDirection.values()[i]);
+            neighbours[i] = neighbour;
+
+        }
+
+        return neighbours;
 
     }
 
@@ -132,7 +151,7 @@ public record LngLat(double longitude, double latitude) {
 
         LngLat newPosition;
         double degree;
-        double moveDistance = 0.00015;
+        double moveDistance = droneMovement;
 
         //hover motion
         if (direction == null){
@@ -151,5 +170,7 @@ public record LngLat(double longitude, double latitude) {
         return newPosition;
 
     }
+
+    public double getDroneMovement(){ return droneMovement; }
 
 }
