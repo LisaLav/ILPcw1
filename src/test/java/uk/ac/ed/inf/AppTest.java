@@ -175,7 +175,7 @@ public class AppTest
 
     }*/
 
-    @Test
+    /*@Test
     public void testGetDeliveryCost() throws MalformedURLException {
 
         URL url = new URL("https://ilp-rest.azurewebsites.net/" + "restaurants");
@@ -282,6 +282,6 @@ public class AppTest
 
         int cost = Order.getDeliveryCost(things,order);
 
-    }
+    }*/
 
 }

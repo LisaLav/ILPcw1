@@ -1,10 +1,12 @@
 package uk.ac.ed.inf.records;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import uk.ac.ed.inf.Drone;
 import uk.ac.ed.inf.enums.CompassDirection;
 import uk.ac.ed.inf.jsons.JSONPoint;
 import uk.ac.ed.inf.RESTUrl;
 import uk.ac.ed.inf.algorithms.WindingNumber;
+import uk.ac.ed.inf.jsons.NoFlyZoneJSON;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -16,43 +18,10 @@ import java.net.URL;
  * @param longitude the longitude of the point in the real world
  * @param latitude the latitude of the point in the real world
  */
-public record LngLat(double longitude, double latitude) {
+public record LngLat(double longitude, double latitude){
 
     private static double droneMovement = 0.00015;
     private static double distanceTolerance = 0.00015;
-
-    /**
-     * getCentralAreaPoints connects to the REST server and obtains the coordinates of the up-to-date central area
-     * @param url the base url for the REST server
-     * @return the coordinates that create the central area zone as a JSONPoint array
-     */
-    private static JSONPoint[] getCentralAreaPoints(String url){
-
-        ObjectMapper mapper = new ObjectMapper();
-        JSONPoint[] centralAreaPoints = null;
-
-        //obtaining the central area points here
-        try{
-            URL jsonUrl = new URL(url + "centralArea");
-            centralAreaPoints = mapper.readValue(jsonUrl, JSONPoint[].class);
-
-        } catch(MalformedURLException e){
-            e.printStackTrace();
-        } catch (IOException e){
-            e.printStackTrace();
-        }
-
-        return centralAreaPoints;
-
-    }
-
-    private static JSONPoint[] getNoFlyZones(String url){
-
-        JSONPoint[] noFlyZones = null;
-
-        return noFlyZones;
-
-    }
 
     /**
      * This is here to prevent any coordinates being made that aren't in the rough Edinburgh area
@@ -74,25 +43,33 @@ public record LngLat(double longitude, double latitude) {
      */
     public boolean inCentralArea(){
 
-        JSONPoint[] centralAreaPoints = getCentralAreaPoints(RESTUrl.getUrl());
+        JSONPoint[] centralAreaPoints = Drone.getCentralArea();
 
         //use the WindingNumber class to check if the LngLat is in the central area boundary
-        if (WindingNumber.isInPolygon(this, centralAreaPoints, centralAreaPoints.length)){
-            return true;
-        }
-
-        return false;
+        return WindingNumber.isInPolygon(this, centralAreaPoints, centralAreaPoints.length);
     }
 
     public boolean inNoFlyZone(){
 
-        JSONPoint[] noFlyZonePoints = getNoFlyZones(RESTUrl.getUrl());
+        NoFlyZoneJSON[] noFlyZonePoints = Drone.getNoFlyZones();
 
-        if (WindingNumber.isInPolygon(this, noFlyZonePoints, noFlyZonePoints.length)){
-            return true;
+        //convert NoFlyZonePoints into JSONPoint[]
+        for (NoFlyZoneJSON shape : noFlyZonePoints){
+
+            double[][] coordinates = shape.lnglat;
+            JSONPoint[] polygon = new JSONPoint[coordinates.length];
+
+            for (int i = 0; i < coordinates.length; i++){
+
+                double[] lnglat = coordinates[i];
+                polygon[i] = new JSONPoint(shape.name,lnglat[0],lnglat[1]);
+
+
+            }
+
         }
 
-        return false;
+        return WindingNumber.isInPolygon(this, noFlyZonePoints, noFlyZonePoints.length);
 
     }
 
