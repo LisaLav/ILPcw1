@@ -59,17 +59,24 @@ public record LngLat(double longitude, double latitude){
             double[][] coordinates = shape.lnglat;
             JSONPoint[] polygon = new JSONPoint[coordinates.length];
 
+            //setting up the current no-fly zone polygon
             for (int i = 0; i < coordinates.length; i++){
 
                 double[] lnglat = coordinates[i];
-                polygon[i] = new JSONPoint(shape.name,lnglat[0],lnglat[1]);
+                polygon[i] = new JSONPoint();
+                polygon[i].setLongitude(lnglat[0]);
+                polygon[i].setLatitude(lnglat[1]);
 
+            }
 
+            //if this lnglat is in the polygon then we can stop
+            if (WindingNumber.isInPolygon(this, polygon, polygon.length)){
+                return true;
             }
 
         }
 
-        return WindingNumber.isInPolygon(this, noFlyZonePoints, noFlyZonePoints.length);
+        return false;
 
     }
 

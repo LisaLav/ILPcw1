@@ -27,4 +27,5 @@ public class JSONPoint {
     public double latitude;
 
     public void setLongitude(double longitude){ this.longitude = longitude; }
+    public void setLatitude(double latitude){ this.latitude = latitude; }
 }

@@ -163,6 +163,34 @@ public class AppTest
 
     }
 
+    @Test
+    public void testInNoFlyZoneFalse() throws MalformedURLException{
+
+        String url = "https://ilp-rest.azurewebsites.net/";
+
+        RESTUrl.getInstance(url);
+        Drone.StartDay("a");
+
+        LngLat lnglat = new LngLat(-3.202541470527649, 55.943284737579376);
+
+        assertFalse(lnglat.inNoFlyZone());
+
+    }
+
+    @Test
+    public void testInNoFlyZoneTrue() throws MalformedURLException{
+
+        String url = "https://ilp-rest.azurewebsites.net/";
+
+        RESTUrl.getInstance(url);
+        Drone.StartDay("a");
+
+        LngLat lnglat = new LngLat(-3.190578818321228, 55.94402412577528);
+
+        assertTrue(lnglat.inNoFlyZone());
+
+    }
+
     /*@Test
     public void testSetUpMenuItems() throws MalformedURLException {
 
