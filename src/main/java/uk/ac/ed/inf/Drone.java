@@ -1,7 +1,11 @@
 package uk.ac.ed.inf;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import uk.ac.ed.inf.algorithms.AStar;
+import uk.ac.ed.inf.algorithms.AStarEntry;
+import uk.ac.ed.inf.enums.CompassDirection;
 import uk.ac.ed.inf.enums.OrderOutcome;
 import uk.ac.ed.inf.jsons.JSONPoint;
 import uk.ac.ed.inf.jsons.NoFlyZoneJSON;
@@ -12,6 +16,7 @@ import uk.ac.ed.inf.records.Restaurant;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Clock;
 import java.util.*;
 
 /**
@@ -23,12 +28,11 @@ public class Drone {
     private static int battery = 2000;
     private static OrderStructure[] orders;
     private static HashMap<String,OrderOutcome> dayOrderOutcomes = new HashMap<>();
-    private static HashMap<String,ArrayList<LngLat>> dayOrderMoves = new HashMap<>();
+    private static HashMap<String,ArrayList<AStarEntry>> dayOrderMoves = new HashMap<>();
     private static LngLat currentPosition;
     private static NoFlyZoneJSON[] noFlyZones;
     private static JSONPoint[] centralArea;
-    //stores the paths already calculated to speed up processing time
-    private static ArrayList<ArrayList<LngLat>> calculatedPaths = new ArrayList<>();
+    private static Clock clock = Clock.systemDefaultZone();
 
     /**
      * setCentralAreaPoints connects to the REST server and obtains the coordinates of the up-to-date central area
@@ -73,15 +77,15 @@ public class Drone {
 
     }
 
-    private static ArrayList<LngLat> calculateMoves(OrderStructure order){
+    private static ArrayList<AStarEntry> calculateMoves(OrderStructure order){
 
-        ArrayList<LngLat> moves = null;
+        ArrayList<AStarEntry> moves = null;
         //get the restaurant the order is going to
         Restaurant restaurant = Order.getPizzaRestaurant(order.orderItems[0]);
 
        LngLat restaurantLocation = new LngLat(restaurant.getLongitude(), restaurant.getLatitude());
 
-        moves = AStar.astar(currentPosition, restaurantLocation);
+        moves = AStar.astar(currentPosition, restaurantLocation, clock);
 
         return moves;
 
@@ -105,6 +109,75 @@ public class Drone {
 
     }
 
+    private static void writeDeliveriesJSONs(String date) throws IOException {
+
+        ArrayList<String> deliveries = new ArrayList<>();
+        ObjectMapper mapper = new ObjectMapper();
+        String json;
+        String orderNo;
+        String outcome;
+        int costInPence;
+
+        for (int i = 0; i < orders.length; i++){
+
+            OrderStructure order = orders[i];
+            ObjectNode delivery = mapper.createObjectNode();
+
+            orderNo = order.orderNo;
+            outcome = String.valueOf(dayOrderOutcomes.get(orderNo));
+
+            if (outcome == "Delivered" || outcome == "ValidButNotDelivered"){
+                costInPence = Integer.parseInt(order.priceTotalInPence);
+            } else {
+                //for invalid orders we can place the costInPence as 0
+                costInPence = 0;
+            }
+
+            delivery.put("orderNo", orderNo);
+            delivery.put("outcome", outcome);
+            delivery.put("costInPence", costInPence);
+            json = mapper.writeValueAsString(delivery);
+            deliveries.add(json);
+
+        }
+
+        FileHandler.writeDeliveries(date, deliveries.toString());
+
+    }
+
+    private static void recordMovements(){
+
+        //loop through each of the orders from today and record each of the movements the drone made
+        for (int i = 0; i < orders.length; i++){
+
+            String orderNo = orders[i].orderNo;
+            ArrayList<AStarEntry> path = dayOrderMoves.get(orderNo);
+
+            //and now loop through all the movements in the path and record it
+            for (int j = 0; j < path.size()-1; j = j+2){
+
+            }
+
+        }
+
+        /*LngLat fromLngLat = from.getCoords();
+        LngLat toLngLat = null;
+        CompassDirection angle = null;
+        int ticksSinceStart = 0;
+        if (to != null) {
+            toLngLat = to.getCoords();
+            angle = to.getAngle();
+            ticksSinceStart = to.getTimeToCompute().getNano();
+        }
+
+        try {
+            FileHandler.writeFlightpathJSONs(orderNo, fromLngLat, toLngLat, angle, ticksSinceStart);
+        } catch (JsonProcessingException e){
+            System.out.println("Error processing JSON in AStar recordMovements.");
+        }*/
+
+    }
+
     public static void StartDay(String date) throws MalformedURLException {
 
         orders = Order.getDayOrders(date);
@@ -112,10 +185,9 @@ public class Drone {
         noFlyZones = setNoFlyZones(RESTUrl.getUrl());
         currentPosition = appletonTower;
         OrderOutcome currentOrderOutcome = null;
-        ArrayList<LngLat> currentMoves = null;
+        ArrayList<AStarEntry> currentMoves = null;
 
         orderOrdersByDistance();
-        int i = 0;
 
         for (OrderStructure currentOrder : orders){
 
@@ -125,6 +197,7 @@ public class Drone {
             if ((currentOrderOutcome != OrderOutcome.ValidButNotDelivered) || (battery < 0)){
 
                 dayOrderOutcomes.put(currentOrder.orderNo, currentOrderOutcome);
+                dayOrderMoves.put(currentOrder.orderNo, null);
                 continue;
 
             }
@@ -136,12 +209,20 @@ public class Drone {
 
             //if the current order makes the battery go into negative values, then we have to stop as the battery has run out
             if (battery < 0){
+                dayOrderOutcomes.put(currentOrder.orderNo, currentOrderOutcome);
+                dayOrderMoves.put(currentOrder.orderNo, null);
                 continue;
             }
 
+            dayOrderOutcomes.put(currentOrder.orderNo, OrderOutcome.Delivered);
             dayOrderMoves.put(currentOrder.orderNo, currentMoves);
-            System.out.println(i);
-            i++;
+        }
+
+        try{
+            writeDeliveriesJSONs(date);
+            recordMovements();
+        } catch (IOException e){
+            System.out.println("Error writing deliveries to file.");
         }
 
     }

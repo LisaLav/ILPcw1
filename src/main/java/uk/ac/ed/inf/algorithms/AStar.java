@@ -1,18 +1,24 @@
 package uk.ac.ed.inf.algorithms;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import uk.ac.ed.inf.Drone;
+import uk.ac.ed.inf.FileHandler;
+import uk.ac.ed.inf.enums.CompassDirection;
 import uk.ac.ed.inf.jsons.NoFlyZoneJSON;
 import uk.ac.ed.inf.records.LngLat;
 
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.PriorityQueue;
 
 public class AStar {
 
-    final static private int verticalCost = 14;
-    final static private int diagonalCost = 12;
-    final static private int diagonalDiagonalCost = 10;
+    final static private int verticalCost = 1;
+    final static private double diagonalCost = Math.sqrt(2);
 
     private static double heuristic(LngLat a, LngLat b){
 
@@ -20,25 +26,37 @@ public class AStar {
         double dx = Math.abs(a.longitude() - b.longitude());
         double dy = Math.abs(a.latitude() - b.latitude());
 
-        double distance = diagonalDiagonalCost*(Math.min(dx,dy)) + diagonalCost*(Math.min(dx,dy)) + verticalCost*(dx - dy);
+        double distance = verticalCost * (dx + dy) + ((diagonalCost-2)*verticalCost) * Math.min(dx,dy);
 
         return distance;
 
 
     }
 
-    private static ArrayList<LngLat> reconstructPath(AStarEntry start){
+    private static ArrayList<AStarEntry> reconstructPath(AStarEntry start){
 
         //note that the array is built backwards, so the final element is where the *actual* start is
-        ArrayList<LngLat> path = new ArrayList<LngLat>();
+        ArrayList<AStarEntry> path = new ArrayList<AStarEntry>();
 
-        //the drone has to hover at its destination, so we add the start entry twice
-        path.add(start.getCoords());
+        //the drone has to hover at its destination, so we add a null
+        path.add(null);
 
         //add each LngLat parent to the path
         for (AStarEntry entry = start; entry != null; entry = entry.getParent()) {
-            path.add(entry.getCoords());
+            path.add(entry);
         }
+
+        //and we need to add the path back to Appleton Tower too
+        Collections.reverse(path);
+        //so now we can keep on adding the paths as before
+        for (AStarEntry entry = start; entry != null; entry = entry.getParent()){
+
+            path.add(entry);
+
+        }
+
+        //and final null value for the hover at Appleton Tower
+        path.add(null);
 
         return path;
 
@@ -82,14 +100,14 @@ public class AStar {
 
     }
 
-    public static ArrayList<LngLat> astar(LngLat start, LngLat goal){
+    public static ArrayList<AStarEntry> astar(LngLat start, LngLat goal, Clock clock){
 
         //variables for A* algorithm
         PriorityQueue<AStarEntry> openNodes = new PriorityQueue<>();
         HashMap<LngLat, Double> gScore = new HashMap<>();
         HashMap<LngLat, Double> fScore = new HashMap<>();
         ArrayList<LngLat> closedNodes = new ArrayList<>();
-        AStarEntry startEntry = new AStarEntry(start, 0.0, null);
+        AStarEntry startEntry = new AStarEntry(start, 0.0, null, Clock.tick(clock, Duration.ofMillis(1)).instant(), null);
 
         //variables to ensure path doesn't go over no-fly zones or into central area too many times
         NoFlyZoneJSON[] noFlyZone = Drone.getNoFlyZones();
@@ -122,6 +140,9 @@ public class AStar {
                 double neighbourGScore = gScore.get(currentCoords) + currentCoords.getDroneMovement();
                 double neighbourHScore = heuristic(neighbour, goal);
                 double neighbourFScore = neighbourGScore + neighbourHScore;
+                Instant ticksSinceCalculation = Clock.tick(clock, Duration.ofMillis(1)).instant();
+                //this is the angle that the drone must take from the current coordinates to the neighbour
+                CompassDirection angle = currentCoords.getNeighbourAngle(neighbour);
 
                 //skip if the neighbour is already in openNodes, and that neighbour has a better f score than this one
                 if ((openNodes.contains(neighbour) || closedNodes.contains(neighbour)) && neighbourFScore >= fScore.get(neighbour)){
@@ -142,7 +163,7 @@ public class AStar {
                 }
 
                 //else it is a better path, so add it to openNodes, update g and f scores, and add to/replace cameFrom
-                AStarEntry neighbourEntry = new AStarEntry(neighbour, neighbourFScore, current);
+                AStarEntry neighbourEntry = new AStarEntry(neighbour, neighbourFScore, current, ticksSinceCalculation, angle);
 
                 gScore.put(neighbour, neighbourGScore);
                 fScore.put(neighbour, neighbourFScore);

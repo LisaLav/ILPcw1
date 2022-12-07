@@ -1,13 +1,16 @@
 package uk.ac.ed.inf.algorithms;
 
+import uk.ac.ed.inf.enums.CompassDirection;
 import uk.ac.ed.inf.records.LngLat;
+
+import java.time.Instant;
 
 /**
  * This class helps the AStar class in implementing the priority queues according to a LngLat's f values
  * @param coords
  * @param fValue
  */
-public record AStarEntry(LngLat coords, Double fValue, AStarEntry parent) implements Comparable<AStarEntry>{
+public record AStarEntry(LngLat coords, Double fValue, AStarEntry parent, Instant timeToCompute, CompassDirection angle) implements Comparable<AStarEntry>{
 
     /**
      *
@@ -30,5 +33,7 @@ public record AStarEntry(LngLat coords, Double fValue, AStarEntry parent) implem
     public LngLat getCoords(){ return this.coords; }
     public Double getFValue(){ return this.fValue; }
     public AStarEntry getParent(){ return this.parent; }
+    public Instant getTimeToCompute(){ return this.timeToCompute; }
+    public CompassDirection getAngle(){ return this.angle; }
 
 }

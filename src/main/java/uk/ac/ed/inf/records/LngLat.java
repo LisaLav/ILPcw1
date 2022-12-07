@@ -125,6 +125,23 @@ public record LngLat(double longitude, double latitude){
 
     }
 
+    public CompassDirection getNeighbourAngle(LngLat to){
+
+        CompassDirection angle = null;
+
+        for (CompassDirection direction : CompassDirection.values()){
+
+            if (this.nextPosition(direction).equals(to)){
+                angle = direction;
+                break;
+            }
+
+        }
+
+        return angle;
+
+    }
+
     /**
      * This method calculates the new position of this LngLat using trigonometry with the
      * passed in angle
