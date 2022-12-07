@@ -45,4 +45,7 @@ public record Restaurant(String name, double longitude, double latitude, Menu[] 
 
     }
 
+    public double getLongitude(){ return this.longitude; }
+    public double getLatitude(){ return this.latitude; }
+
 }

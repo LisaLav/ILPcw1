@@ -1,7 +1,6 @@
 package uk.ac.ed.inf.algorithms;
 
 import uk.ac.ed.inf.Drone;
-import uk.ac.ed.inf.jsons.JSONPoint;
 import uk.ac.ed.inf.jsons.NoFlyZoneJSON;
 import uk.ac.ed.inf.records.LngLat;
 
@@ -11,11 +10,11 @@ import java.util.PriorityQueue;
 
 public class AStar {
 
-    private static double heuristic(LngLat a, LngLat b){
+    final static private int verticalCost = 14;
+    final static private int diagonalCost = 12;
+    final static private int diagonalDiagonalCost = 10;
 
-        int verticalCost = 14;
-        int diagonalCost = 12;
-        int diagonalDiagonalCost = 10;
+    private static double heuristic(LngLat a, LngLat b){
 
         //calculate the octile distance between two points
         double dx = Math.abs(a.longitude() - b.longitude());
@@ -30,7 +29,11 @@ public class AStar {
 
     private static ArrayList<LngLat> reconstructPath(AStarEntry start){
 
+        //note that the array is built backwards, so the final element is where the *actual* start is
         ArrayList<LngLat> path = new ArrayList<LngLat>();
+
+        //the drone has to hover at its destination, so we add the start entry twice
+        path.add(start.getCoords());
 
         //add each LngLat parent to the path
         for (AStarEntry entry = start; entry != null; entry = entry.getParent()) {
@@ -86,7 +89,6 @@ public class AStar {
         HashMap<LngLat, Double> gScore = new HashMap<>();
         HashMap<LngLat, Double> fScore = new HashMap<>();
         ArrayList<LngLat> closedNodes = new ArrayList<>();
-        ArrayList<LngLat> cameFrom = new ArrayList<>();
         AStarEntry startEntry = new AStarEntry(start, 0.0, null);
 
         //variables to ensure path doesn't go over no-fly zones or into central area too many times
@@ -107,8 +109,6 @@ public class AStar {
 
             //if current is close to the goal then we can stop
             if (currentCoords.closeTo(goal)){
-                //reset the number of times we crossed the central area boundary for next time
-                noTimesCrossedCentralArea = 0;
                 return reconstructPath(current);
             }
 
@@ -130,16 +130,7 @@ public class AStar {
                     continue;
                 } else if (intersectNoFlyZone(currentCoords, neighbour, noFlyZone)){
                     continue;
-                } else if (currentCoords.inCentralArea() && !neighbour.inCentralArea()){ //here we're crossing the central area boundary in -> out
-
-                    noTimesCrossedCentralArea++;
-
-                    if (noTimesCrossedCentralArea > 2){ //here if it's > 2 then this neighbour will make us cross over the central area too many times
-                        noTimesCrossedCentralArea--;
-                        continue;
-                    }
-
-                } else if (!currentCoords.inCentralArea() && neighbour.inCentralArea()){ //here we're crossing the central area boundary out -> in
+                } else if ((currentCoords.inCentralArea() && !neighbour.inCentralArea()) || (!currentCoords.inCentralArea() && neighbour.inCentralArea())){ //here we're crossing the central area boundary in -> out OR out -> in
 
                     noTimesCrossedCentralArea++;
 

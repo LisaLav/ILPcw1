@@ -16,7 +16,7 @@ public class AStarTest {
         LngLat appletonTower = new LngLat(-3.186874, 55.944494);
         LngLat restaurant = new LngLat(-3.1940174102783203, 55.94390696616939);
         RESTUrl.getInstance("https://ilp-rest.azurewebsites.net/");
-        Drone.StartDay(null);
+        Drone.StartDay("2022-04-20");
 
         ArrayList<LngLat> path = AStar.astar(appletonTower,restaurant);
         Vector<LngLat> path2 = new Vector<LngLat>(path);

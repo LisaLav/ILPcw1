@@ -86,7 +86,7 @@ public class Card {
         YearMonth expiryDate = null;
         String cvv = cardDetails.get(2);
         String cardNumber = cardDetails.get(0);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yy");
 
         if ((cvv == null) || !checkCVV(cvv)){
             isValid = 1;

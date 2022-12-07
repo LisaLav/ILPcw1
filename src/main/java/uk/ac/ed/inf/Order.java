@@ -53,15 +53,15 @@ public class Order {
 
                 case 1:
                     isValid = OrderOutcome.InvalidCvv;
-                    break;
+                    return isValid;
 
                 case 2:
                     isValid = OrderOutcome.InvalidExpiryDate;
-                    break;
+                    return isValid;
 
                 case 3:
                     isValid = OrderOutcome.InvalidCardNumber;
-                    break;
+                    return isValid;
             }
         }
 
@@ -69,10 +69,13 @@ public class Order {
             cost = getDeliveryCost(orderItems);
         } catch (InvalidPizzaNotDefined e){
             isValid = OrderOutcome.InvalidPizzaNotDefined;
+            return isValid;
         } catch (InvalidPizzaCount e){
             isValid = OrderOutcome.InvalidPizzaCount;
+            return isValid;
         } catch (InvalidPizzaCombinationMultipleSuppliers e){
             isValid = OrderOutcome.InvalidPizzaCombinationMultipleSuppliers;
+            return isValid;
         }
 
         if (cost != Integer.parseInt(order.priceTotalInPence)){
@@ -199,6 +202,18 @@ public class Order {
     }
 
     public static Restaurant getPizzaRestaurant(String pizza){
+
+        //in case we try to call getPizzaRestaurant when it's still empty
+        if (menuItems.isEmpty()){
+
+            try{
+                setUpMenuItems();
+            } catch(MalformedURLException e){
+                System.out.println("MalformedURLException while setting up menu in Order.java");
+                exit(1);
+            }
+        }
+
         return restaurantPizzas.get(pizza);
     }
 

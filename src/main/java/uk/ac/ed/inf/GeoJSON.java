@@ -41,14 +41,4 @@ public class GeoJSON {
         }
     }
 
-    // main file to test the code with longitudes in the range -3.184319 and -3.192473 and latitudes in the range 55.946233 and 55.942617
-    public static void main(String[] args) {
-        // Create a Vector of LngLat
-        Vector<LngLat> path = new Vector<>();
-        // Add LngLat to the Vector
-        path.add(new LngLat(-3.184319, 55.946233));
-        path.add(new LngLat(-3.192473, 55.942617));
-        // Call writeGeoJson
-        generateGeoJson("test.geojson", path);
-    }
 }
