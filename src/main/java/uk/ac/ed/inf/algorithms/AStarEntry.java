@@ -20,20 +20,38 @@ public record AStarEntry(LngLat coords, Double fValue, AStarEntry parent, Instan
     @Override
     public int compareTo(AStarEntry entry) {
 
-        if (entry.getFValue() > this.fValue){
-            return -1;
-        } else if (entry.getFValue() == this.fValue){
-            return 0;
-        } else{
-            return 1;
-        }
+        return this.fValue.compareTo(entry.getFValue());
 
     }
 
+    /**
+     * Returns the LngLat of the coordinates
+     * @return the coordinates
+     */
     public LngLat getCoords(){ return this.coords; }
+
+    /**
+     * Returns the f value
+     * @return f value
+     */
     public Double getFValue(){ return this.fValue; }
+
+    /**
+     * Returns the parent LngLat of this entry
+     * @return the parent LngLat
+     */
     public AStarEntry getParent(){ return this.parent; }
+
+    /**
+     * Returns the time it took to compute this entry
+     * @return the time to compute
+     */
     public Instant getTimeToCompute(){ return this.timeToCompute; }
+
+    /**
+     * Returns the angle of the entry according to its parent
+     * @return the angle
+     */
     public CompassDirection getAngle(){ return this.angle; }
 
 }

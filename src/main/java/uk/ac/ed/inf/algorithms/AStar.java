@@ -1,8 +1,6 @@
 package uk.ac.ed.inf.algorithms;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import uk.ac.ed.inf.Drone;
-import uk.ac.ed.inf.FileHandler;
 import uk.ac.ed.inf.enums.CompassDirection;
 import uk.ac.ed.inf.jsons.NoFlyZoneJSON;
 import uk.ac.ed.inf.records.LngLat;
@@ -15,28 +13,44 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.PriorityQueue;
 
+/**
+ * A* algorithm for calculating the moves of the drone for a single order
+ * This implements the A* algorithm from <a href="https://en.wikipedia.org/wiki/A*_search_algorithm">Wikipedia</a>
+ */
 public class AStar {
 
+    //how much a vertical/horizontal move costs
     final static private int verticalCost = 1;
+    //how much a diagonal move costs
     final static private double diagonalCost = Math.sqrt(2);
 
+    /**
+     * This is the heuristic of the A* algorithm. It uses the octile distance heuristic.
+     * @param a the first point
+     * @param b the second point
+     * @return the heuristic value according to octile distance
+     */
     private static double heuristic(LngLat a, LngLat b){
 
         //calculate the octile distance between two points
         double dx = Math.abs(a.longitude() - b.longitude());
         double dy = Math.abs(a.latitude() - b.latitude());
 
-        double distance = verticalCost * (dx + dy) + ((diagonalCost-2)*verticalCost) * Math.min(dx,dy);
-
-        return distance;
+        return verticalCost * (dx + dy) + ((diagonalCost-2)*verticalCost) * Math.min(dx,dy);
 
 
     }
 
+    /**
+     * This method reconstructs the path from the start to the goal.
+     * It also adds on the return journey from the goal to the start.
+     * @param start the point to start constructing the path from (the goal)
+     * @return the path from the start to the goal
+     */
     private static ArrayList<AStarEntry> reconstructPath(AStarEntry start){
 
         //note that the array is built backwards, so the final element is where the *actual* start is
-        ArrayList<AStarEntry> path = new ArrayList<AStarEntry>();
+        ArrayList<AStarEntry> path = new ArrayList<>();
 
         //the drone has to hover at its destination, so we add a null
         path.add(new AStarEntry(null, start.fValue(), start, start.getTimeToCompute(), null));
@@ -48,11 +62,10 @@ public class AStar {
 
         //and we need to add the path back to Appleton Tower too
         Collections.reverse(path);
+
         //so now we can keep on adding the paths as before
         for (AStarEntry entry = start; entry != null; entry = entry.getParent()){
-
             path.add(entry);
-
         }
 
         //and final null value for the hover at Appleton Tower
@@ -62,9 +75,17 @@ public class AStar {
 
     }
 
-    //https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
+    /**
+     * intersectNoFlyZone checks if the drone is going to intersect a no-fly zone
+     * It uses the algorithm from <a href="https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/">GeeksForGeeks</a>
+     * @param from the point the drone is moving from
+     * @param to the point the drone is moving to
+     * @param noFlyZone the list of no-fly zones to check against
+     * @return if the drone is going to intersect a no-fly zone
+     */
     private static boolean intersectNoFlyZone(LngLat from, LngLat to, NoFlyZoneJSON[] noFlyZone){
 
+        //perform the check for each no-fly zone
         for (NoFlyZoneJSON polygon : noFlyZone){
 
             double[][] coordinates = polygon.lnglat;
@@ -86,6 +107,13 @@ public class AStar {
 
     }
 
+    /**
+     * Helper method for intersectNoFlyZone
+     * @param a point a
+     * @param b point b
+     * @param c point c
+     * @return the orientation of the points
+     */
     private static int orientation(LngLat a, LngLat b, LngLat c){
 
         double value = (b.latitude() - a.latitude()) * (c.longitude() - b.longitude()) - (b.longitude() - a.longitude()) * (c.latitude() - b.latitude());
@@ -100,6 +128,13 @@ public class AStar {
 
     }
 
+    /**
+     * This is the A* algorithm. It calculates the path from the start to the goal and returns it.
+     * @param start the start point
+     * @param goal the end point
+     * @param clock the clock to find out how long it took to calculate each point
+     * @return the path from the start to the goal and back again
+     */
     public static ArrayList<AStarEntry> astar(LngLat start, LngLat goal, Clock clock){
 
         //variables for A* algorithm

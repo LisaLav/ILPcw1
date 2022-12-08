@@ -1,13 +1,23 @@
 package uk.ac.ed.inf.algorithms;
 
+/**
+ * This class implements the Luhns algorithm by <a href="https://en.wikipedia.org/wiki/Luhn_algorithm">Wikipedia</a>
+ * It determines if a card is valid based on the computations in the card number
+ */
 public class Luhns {
 
+    /**
+     * This method checks if a card number is valid by using Luhns algorithm
+     * @param cardNumber the card number to be validated
+     * @return whether the card number is valid or not
+     */
     public static boolean validateCardNumber(String cardNumber){
 
-        boolean isValid = false;
+        boolean isValid;
+        //each of the variables needed for Luhn's
         int sum = 0;
-        char checkDigit = cardNumber.charAt(15);
         int[] doubledDigits = {0, 0, 0, 0, 0, 0, 0, 0};
+        //j is used to double the digits that need doubling in the algorithm in the loop
         int j = 0;
 
         //calculate the sum for Luhn
@@ -36,6 +46,7 @@ public class Luhns {
 
         }
 
+        //the card number is valid if it's divisible by 10
         isValid = (sum % 10) == 0;
 
         return isValid;
