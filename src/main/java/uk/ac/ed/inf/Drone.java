@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Clock;
+import java.time.Duration;
 import java.util.*;
 
 /**
@@ -33,6 +34,7 @@ public class Drone {
     private static NoFlyZoneJSON[] noFlyZones;
     private static JSONPoint[] centralArea;
     private static Clock clock = Clock.systemDefaultZone();
+    private static int timeWhenStarted;
 
     /**
      * setCentralAreaPoints connects to the REST server and obtains the coordinates of the up-to-date central area
@@ -152,10 +154,56 @@ public class Drone {
 
             String orderNo = orders[i].orderNo;
             ArrayList<AStarEntry> path = dayOrderMoves.get(orderNo);
+            Double angle;
+            int ticksFromStart = 0;
+
+            //if the path is null that means that the order wasn't delivered, so we record no movements
+            if (path == null){
+                continue;
+            }
+
+            //System.out.println(path.size());
 
             //and now loop through all the movements in the path and record it
             for (int j = 0; j < path.size()-1; j = j+2){
 
+                LngLat from = path.get(j).getCoords();
+                LngLat to = path.get(j+1).getCoords();
+
+                //if to is null then the drone is hovering, so can't get degree
+                if (to != null) {
+                    angle = path.get(j+1).getAngle().getDegree();
+
+                    //this checks if we're going back to Appleton Tower or not
+                    if (j >= (path.size()/2)-1){
+                        //the angle is 180 degrees turned
+                        angle = (angle + 180)%360;
+                    }
+
+                } else {
+                    angle = null;
+                }
+
+                //this checks if we're going back to Appleton Tower or not
+                if (j >= (path.size()/2)-1){
+                    orderNo = "no-order";
+                }
+
+                ticksFromStart = path.get(j).getTimeToCompute().getNano() - timeWhenStarted;
+
+
+                try {
+                    FileHandler.writeFlightpathJSONs(orderNo, from, to, angle, ticksFromStart);
+                } catch(JsonProcessingException e){
+                    System.out.println("Error processing flightpath JSON.");
+                }
+
+            }
+
+            try {
+                FileHandler.writeFlightPath(orders[0].orderDate);
+            } catch(IOException e){
+                System.out.println("Error writing flightpath output file.");
             }
 
         }
@@ -186,6 +234,8 @@ public class Drone {
         currentPosition = appletonTower;
         OrderOutcome currentOrderOutcome = null;
         ArrayList<AStarEntry> currentMoves = null;
+        timeWhenStarted = Clock.tick(clock, Duration.ofMillis(1)).instant().getNano();
+        System.out.println(timeWhenStarted);
 
         orderOrdersByDistance();
 

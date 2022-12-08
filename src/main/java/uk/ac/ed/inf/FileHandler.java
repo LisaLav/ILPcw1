@@ -12,36 +12,60 @@ import java.util.ArrayList;
 
 public class FileHandler {
 
-    public static void writeFlightpathJSONs(String orderNo, LngLat from, LngLat to, CompassDirection angleCompass, int ticksSinceStart) throws JsonProcessingException {
+    private static ArrayList<String> flightpath = new ArrayList<String>();
 
-        ArrayList<String> moves = new ArrayList<>();
+    public static void writeFlightpathJSONs(String orderNo, LngLat from, LngLat to, Double angle, int ticksSinceStart) throws JsonProcessingException {
+
         ObjectMapper mapper = new ObjectMapper();
 
         ObjectNode move = mapper.createObjectNode();
-        double angle = 0;
-
-        if (angleCompass != null){
-            angle = angleCompass.getDegree();
-        } else if (to == null){
-            to = from;
-        }
 
         move.put("orderNo", orderNo);
-        move.put("fromLongitude", from.longitude());
-        move.put("fromLatitude", from.latitude());
-        move.put("angle", angle);
-        move.put("toLongitude", to.longitude());
-        move.put("toLatitude", to.latitude());
+
+        //if angle is null then LngLat to is null
+        if (angle == null){
+
+            move.put("fromLongitude", from.longitude());
+            move.put("fromLatitude", from.latitude());
+            move.put("angle", angle);
+            move.put("toLongitude", from.longitude());
+            move.put("toLatitude", from.latitude());
+
+        } else if (from == null){
+
+            move.put("fromLongitude", to.longitude());
+            move.put("fromLatitude", to.latitude());
+            move.put("angle", angle);
+            move.put("toLongitude", to.longitude());
+            move.put("toLatitude", to.latitude());
+
+        } else {
+
+            move.put("fromLongitude", from.longitude());
+            move.put("fromLatitude", from.latitude());
+            move.put("angle", angle);
+            move.put("toLongitude", to.longitude());
+            move.put("toLatitude", to.latitude());
+
+        }
+
         move.put("ticksSinceStartOfCalculation", ticksSinceStart);
 
         String json = mapper.writeValueAsString(move);
-        moves.add(json);
+        flightpath.add(json);
 
     }
 
-    public static void writeFlightPath(String date, String moves){
+    public static void writeFlightPath(String date) throws IOException {
 
-        String filename = "flightpath" + date + ".json";
+        String filename = "flightpath-" + date + ".json";
+
+        FileWriter fileWriter = new FileWriter(filename);
+
+        String flightpathArray = flightpath.toString();
+
+        fileWriter.write(flightpathArray);
+
 
     }
 

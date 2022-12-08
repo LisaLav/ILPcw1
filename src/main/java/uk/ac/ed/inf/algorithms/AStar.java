@@ -39,7 +39,7 @@ public class AStar {
         ArrayList<AStarEntry> path = new ArrayList<AStarEntry>();
 
         //the drone has to hover at its destination, so we add a null
-        path.add(null);
+        path.add(new AStarEntry(null, start.fValue(), start, start.getTimeToCompute(), null));
 
         //add each LngLat parent to the path
         for (AStarEntry entry = start; entry != null; entry = entry.getParent()) {
@@ -56,7 +56,7 @@ public class AStar {
         }
 
         //and final null value for the hover at Appleton Tower
-        path.add(null);
+        path.add(new AStarEntry(null, null, null, path.get(path.size()-1).getTimeToCompute(), null));
 
         return path;
 
@@ -108,6 +108,7 @@ public class AStar {
         HashMap<LngLat, Double> fScore = new HashMap<>();
         ArrayList<LngLat> closedNodes = new ArrayList<>();
         AStarEntry startEntry = new AStarEntry(start, 0.0, null, Clock.tick(clock, Duration.ofMillis(1)).instant(), null);
+        System.out.println(Clock.tick(clock, Duration.ofMillis(1)).instant().getNano());
 
         //variables to ensure path doesn't go over no-fly zones or into central area too many times
         NoFlyZoneJSON[] noFlyZone = Drone.getNoFlyZones();
