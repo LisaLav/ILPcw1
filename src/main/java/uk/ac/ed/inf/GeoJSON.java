@@ -3,31 +3,41 @@ package uk.ac.ed.inf;
 import uk.ac.ed.inf.records.LngLat;
 import com.mapbox.geojson.*;
 
-import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+/**
+ * GeoJSON helps to create valid geojson objects
+ */
 public class GeoJSON {
-    // Method which takes Vector of LngLat and writes it to a geojson file
+
+    /**
+     * generateGeoJson converts the parameters into a geojson format
+     * @param path the points along a path to be converted
+     * @return a geojson string of the path
+     */
     public static String generateGeoJson(Vector<LngLat> path) {
-        // Initialise a List of Points type used by geojson
+
+        //initialise a list of points used by geojson
         List<Point> points = new ArrayList<>();
-        // Loop through the path, convert each LngLat to a Point and add it to the List
+
+        //loop through the path, convert each LngLat to a point and add it to the list
         for (LngLat lngLat : path) {
             points.add(Point.fromLngLat(lngLat.longitude(), lngLat.latitude()));
         }
-        // Create a LineString from the List of Points
+
+        //create a LineString from the points
         LineString lineString = LineString.fromLngLats(points);
-        // Create a Feature from the LineString
+
+        //create a feature from the LineString
         Feature feature = Feature.fromGeometry(lineString);
-        // Create a FeatureCollection from the Feature
+
+        //create a FeatureCollection/geojson from the feature
         FeatureCollection featureCollection = FeatureCollection.fromFeature(feature);
 
-        // Convert the FeatureCollection to a String
-        String geoJson = featureCollection.toJson();
-
-        return geoJson;
+        //return the geojson as a string
+        return featureCollection.toJson();
 
     }
 

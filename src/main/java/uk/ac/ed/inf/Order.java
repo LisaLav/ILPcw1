@@ -10,7 +10,6 @@ import uk.ac.ed.inf.jsons.Menu;
 import uk.ac.ed.inf.jsons.OrderStructure;
 import uk.ac.ed.inf.records.Restaurant;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -27,57 +26,75 @@ public class Order {
     /**
      * A Hashmap that maps the names of menu items to the prices that the item it
      */
-    private static HashMap<String,Integer> menuItems = new HashMap<String,Integer>();
+    final private static HashMap<String,Integer> menuItems = new HashMap<>();
 
     /**
      * A Hashmap that maps all the potential menu items to the restaurant they belong to
      */
-    private static HashMap<String, Restaurant> restaurantPizzas = new HashMap<String,Restaurant>();
+    final private static HashMap<String, Restaurant> restaurantPizzas = new HashMap<>();
 
-    public static OrderOutcome validateOrder(OrderStructure order) throws MalformedURLException {
+    /**
+     * validateOrder takes a single order and checks if its invalid in any way
+     * It checks the credit card and pizzas ordered to see if they are valid
+     * @param order the order to be validated
+     * @return the outcome of the order. It is ValidButNotDelivered by default, but changes if it is invalid
+     */
+    public static OrderOutcome validateOrder(OrderStructure order) {
 
         OrderOutcome isValid = OrderOutcome.ValidButNotDelivered;
         ArrayList<String> cardDetails = new ArrayList<>();
-        ArrayList<String> orderItems = new ArrayList<>();
-        int cost = 100;
+        int cost;
 
+        //set up the card details and the pizzas to be validated
         cardDetails.add(order.creditCardNumber);
         cardDetails.add(order.creditCardExpiry);
         cardDetails.add(order.cvv);
-        orderItems.addAll(Arrays.asList(order.orderItems));
+        ArrayList<String> orderItems = new ArrayList<>(Arrays.asList(order.orderItems));
 
+        //the value of cardValidate shows if the card is invalid, and if so how
         int cardValidate = Card.checkCreditCard(cardDetails);
 
+        //if cardValidate == 0, then the card is valid
         if (cardValidate != 0){
-            switch (cardValidate){
+            switch (cardValidate) {
 
-                case 1:
+                //it has an invalid cvv
+                case 1 -> {
                     isValid = OrderOutcome.InvalidCvv;
                     return isValid;
+                }
 
-                case 2:
+                //invalid expiry date
+                case 2 -> {
                     isValid = OrderOutcome.InvalidExpiryDate;
                     return isValid;
+                }
 
-                case 3:
+                //invalid card number
+                case 3 -> {
                     isValid = OrderOutcome.InvalidCardNumber;
                     return isValid;
+                }
             }
         }
 
+        //if getDeliveryCost throws an error, then the ordered items were invalid in some way
         try{
             cost = getDeliveryCost(orderItems);
-        } catch (InvalidPizzaNotDefined e){
+            //add on 100 for the delivery fee
+            cost = cost + 100;
+        } catch (InvalidPizzaNotDefined e){ //if a pizza doesn't exist in the menus
             isValid = OrderOutcome.InvalidPizzaNotDefined;
             return isValid;
-        } catch (InvalidPizzaCount e){
+        } catch (InvalidPizzaCount e){ //if there's too many pizzas or not enough
             isValid = OrderOutcome.InvalidPizzaCount;
             return isValid;
-        } catch (InvalidPizzaCombinationMultipleSuppliers e){
+        } catch (InvalidPizzaCombinationMultipleSuppliers e){ //if the pizzas come from more than 1 restaurant
             isValid = OrderOutcome.InvalidPizzaCombinationMultipleSuppliers;
             return isValid;
         }
 
+        //finally check if the cost calculated is the same as the order's price total
         if (cost != Integer.parseInt(order.priceTotalInPence)){
 
             isValid = OrderOutcome.InvalidTotal;
@@ -97,19 +114,18 @@ public class Order {
         Restaurant[] restaurants = Restaurant.getRestaurantsFromRestServer(restaurantUrl);
 
         //loop through the array of restaurants to obtain the relevant menu list & restaurant
-        for (int i = 0; i < restaurants.length; i++){
+        for (Restaurant value : restaurants) {
 
-            Menu[] menu = restaurants[i].getMenu();
-            Restaurant restaurant = restaurants[i];
+            Menu[] menu = value.getMenu();
 
             //loop through menu array items and add to menuItems hashmap with price
-            for (int j = 0; j < menu.length; j++){
+            for (Menu item : menu) {
 
-                String pizza = menu[j].name;
-                Integer priceInPennies = menu[j].priceInPennies;
+                String pizza = item.name;
+                Integer priceInPennies = item.priceInPennies;
 
-                menuItems.putIfAbsent(pizza,priceInPennies);
-                restaurantPizzas.putIfAbsent(pizza,restaurant);
+                menuItems.putIfAbsent(pizza, priceInPennies);
+                restaurantPizzas.putIfAbsent(pizza, value);
 
             }
 
@@ -117,6 +133,11 @@ public class Order {
 
     }
 
+    /**
+     * This returns all the orders for a specified day
+     * @param date the day to obtain the orders from
+     * @return an array of all the orders
+     */
     public static OrderStructure[] getDayOrders(String date){
 
         ObjectMapper mapper = new ObjectMapper();
@@ -129,10 +150,8 @@ public class Order {
             URL jsonUrl = new URL(url + "/orders/" + date);
             orders = mapper.readValue(jsonUrl, OrderStructure[].class);
 
-        } catch(MalformedURLException e){
-            e.printStackTrace();
-        } catch (IOException e){
-            e.printStackTrace();
+        } catch(Exception e){
+            System.err.println("Error in getDayOrders, Order.java");
         }
 
         return orders;
@@ -201,6 +220,11 @@ public class Order {
 
     }
 
+    /**
+     * getPizzaRestaurant returns the restaurant that the specified pizza belongs to
+     * @param pizza the pizza to find the restaurant of
+     * @return the restaurant it belongs to, if any
+     */
     public static Restaurant getPizzaRestaurant(String pizza){
 
         //in case we try to call getPizzaRestaurant when it's still empty

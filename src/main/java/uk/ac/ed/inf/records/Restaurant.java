@@ -3,8 +3,6 @@ package uk.ac.ed.inf.records;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.ac.ed.inf.jsons.Menu;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -35,17 +33,24 @@ public record Restaurant(String name, double longitude, double latitude, Menu[] 
         //obtain restaurants
         try{
             restaurants = mapper.readValue(url, Restaurant[].class);
-        } catch(MalformedURLException e){
-            e.printStackTrace();
-        } catch (IOException e){
-            e.printStackTrace();
+        } catch(Exception e){
+            System.err.println("Error in getRestaurantsFromRestServer, Restaurant.java");
         }
 
         return restaurants;
 
     }
 
+    /**
+     * Returns the longitude of a restaurant
+     * @return the longitude
+     */
     public double getLongitude(){ return this.longitude; }
+
+    /**
+     * Returns the latitude of a restaurant
+     * @return the latitude
+     */
     public double getLatitude(){ return this.latitude; }
 
 }

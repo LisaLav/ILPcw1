@@ -27,7 +27,7 @@ public enum CompassDirection {
     /**
      * The degree of a compass direction
      */
-    private double degree;
+    final private double degree;
 
     /**
      * Sets the degree for each of the enumerations

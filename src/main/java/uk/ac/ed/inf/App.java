@@ -1,8 +1,6 @@
 package uk.ac.ed.inf;
 
 import org.apache.commons.validator.routines.UrlValidator;
-import uk.ac.ed.inf.records.LngLat;
-
 import java.net.MalformedURLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -10,22 +8,26 @@ import java.time.format.DateTimeFormatter;
 import static java.lang.System.exit;
 
 /**
- * Hello world!
- *
+ * This class is the main class of the application that starts the program.
+ * It contains the main method, which is the entry point of the application.
+ * It also contains the methods that are used to validate the input arguments.
  */
 public class App 
 {
 
+    /**
+     * This sets up all the files, validates the args, and starts the Drone.
+     * @param args arguments from the command line.
+     */
     public static void main( String[] args ){
 
         String date = null;
         String restUrl = null;
-        String hash = null;
 
+        //check if enough args are given
         try{
             date = args[0];
             restUrl = args[1];
-            hash = args[2];
         } catch (ArrayIndexOutOfBoundsException e){
             System.err.println("Not enough arguments put in");
             exit(1);
@@ -46,6 +48,7 @@ public class App
             exit(1);
         }
 
+        //start the drone
         try {
             Drone.StartDay(date);
         } catch (MalformedURLException e){
@@ -55,6 +58,11 @@ public class App
 
     }
 
+    /**
+     * This method checks if the url is valid.
+     * @param url the url to be checked.
+     * @return true if the url is valid, false otherwise.
+     */
     private static boolean validUrl(String url){
 
         UrlValidator validator = new UrlValidator();
@@ -62,13 +70,17 @@ public class App
         return validator.isValid(url);
     }
 
+    /**
+     * This method tries converting the date string into a LocalDate object to check if the date is in a valid format.
+     * @param date the date string to be validated.
+     * @return the date string if it is valid, null if it isn't.
+     */
     private static String convertDate(String date){
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate date1;
 
         try{
-            date1 = LocalDate.parse(date, formatter);
+            LocalDate.parse(date, formatter);
         } catch(DateTimeParseException e){
             return null;
         }

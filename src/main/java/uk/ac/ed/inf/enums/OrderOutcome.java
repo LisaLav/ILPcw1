@@ -1,5 +1,8 @@
 package uk.ac.ed.inf.enums;
 
+/**
+ * An enumeration for
+ */
 public enum OrderOutcome {
 
     Delivered,

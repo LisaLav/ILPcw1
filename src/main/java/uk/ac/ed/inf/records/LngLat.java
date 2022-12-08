@@ -1,16 +1,10 @@
 package uk.ac.ed.inf.records;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.ac.ed.inf.Drone;
 import uk.ac.ed.inf.enums.CompassDirection;
 import uk.ac.ed.inf.jsons.JSONPoint;
-import uk.ac.ed.inf.RESTUrl;
 import uk.ac.ed.inf.algorithms.WindingNumber;
 import uk.ac.ed.inf.jsons.NoFlyZoneJSON;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * LngLat class represents the coordinates of a point for the drone. Uses (longitude,latitude) for representing the coordinates
@@ -20,8 +14,11 @@ import java.net.URL;
  */
 public record LngLat(double longitude, double latitude){
 
-    private static double droneMovement = 0.00015;
-    private static double distanceTolerance = 0.00015;
+    //constant of the length of each move the drone can make
+    final private static double droneMovement = 0.00015;
+
+    //how close the drone can be to a LngLat for closeTo()
+    final private static double distanceTolerance = 0.00015;
 
     /**
      * This is here to prevent any coordinates being made that aren't in the rough Edinburgh area
@@ -49,6 +46,10 @@ public record LngLat(double longitude, double latitude){
         return WindingNumber.isInPolygon(this, centralAreaPoints, centralAreaPoints.length);
     }
 
+    /**
+     * Checks if this LngLat object is in a no-fly zone polygon
+     * @return if LngLat is in a no-fly zone area
+     */
     public boolean inNoFlyZone(){
 
         NoFlyZoneJSON[] noFlyZonePoints = Drone.getNoFlyZones();
@@ -76,6 +77,7 @@ public record LngLat(double longitude, double latitude){
 
         }
 
+        //if we reach here then the lnglat isn't in a no-fly zone
         return false;
 
     }
@@ -88,8 +90,7 @@ public record LngLat(double longitude, double latitude){
     public double distanceTo(LngLat coordsTo){
 
         //calculate using Pythagoras
-        double pythagoreanDistance = Math.sqrt(Math.pow((longitude - coordsTo.longitude),2) + Math.pow((latitude - coordsTo.latitude),2));
-        return pythagoreanDistance;
+        return Math.sqrt(Math.pow((longitude - coordsTo.longitude),2) + Math.pow((latitude - coordsTo.latitude),2));
 
     }
 
@@ -101,19 +102,21 @@ public record LngLat(double longitude, double latitude){
     public boolean closeTo(LngLat coordsTo){
 
         //calculate using distanceTo
-        if (distanceTo(coordsTo) < distanceTolerance){
-            return true;
-        }
-
-        return false;
+        return distanceTo(coordsTo) < distanceTolerance;
 
     }
 
+    /**
+     * This finds all 16 neighbours of the LngLat according to the CompassDirection enum
+     * @return the list of LngLats that are neighbours of this LngLat
+     */
     public LngLat[] getNeighbours(){
 
-        LngLat[] neighbours = new LngLat[16];
-        LngLat neighbour = null;
+        //the number of neighbours is always how many compass directions there are
+        LngLat[] neighbours = new LngLat[CompassDirection.values().length];
+        LngLat neighbour;
 
+        //loop through each compass direction to create the lnglat for the neighbours
         for (int i = 0; i < neighbours.length; i++){
 
             neighbour = nextPosition(CompassDirection.values()[i]);
@@ -125,10 +128,16 @@ public record LngLat(double longitude, double latitude){
 
     }
 
+    /**
+     * getNeighbourAngle calculates the angle that the parameter is at from this LngLat
+     * @param to the LngLat that we want to find the angle towards
+     * @return the CompassDirection to get to the parameter LngLat from this LngLat
+     */
     public CompassDirection getNeighbourAngle(LngLat to){
 
         CompassDirection angle = null;
 
+        //loop through each compass direction to see if it's equal to parameter to
         for (CompassDirection direction : CompassDirection.values()){
 
             if (this.nextPosition(direction).equals(to)){
@@ -172,6 +181,10 @@ public record LngLat(double longitude, double latitude){
 
     }
 
+    /**
+     * This gets how far the drone can move per move
+     * @return the drone movement variable
+     */
     public double getDroneMovement(){ return droneMovement; }
 
 }

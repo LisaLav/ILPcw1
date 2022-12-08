@@ -26,6 +26,15 @@ public class JSONPoint {
     @JsonProperty("latitude")
     public double latitude;
 
+    /**
+     * Set the longitude of the JSONPoint
+     * @param longitude the longitude to set to
+     */
     public void setLongitude(double longitude){ this.longitude = longitude; }
+
+    /**
+     * Set the latitude of the JSONPoint
+     * @param latitude the latitude to set to
+     */
     public void setLatitude(double latitude){ this.latitude = latitude; }
 }

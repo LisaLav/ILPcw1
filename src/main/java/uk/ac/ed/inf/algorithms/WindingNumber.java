@@ -5,7 +5,7 @@ import uk.ac.ed.inf.records.LngLat;
 
 /**
  * WindingNumber is an algorithm that calculates whether a point is contained by a polygon
- * This has been helped by https://web.archive.org/web/20130126163405/http://geomalgorithms.com/a03-_inclusion.html, using its pseudocode
+ * This has been helped by <a href="https://web.archive.org/web/20130126163405/http://geomalgorithms.com/a03-_inclusion.html">...</a>, using its pseudocode
  * It has been converted to Java by myself
  */
 public class WindingNumber {
@@ -42,11 +42,7 @@ public class WindingNumber {
 
         //if the distance from point 3 to points 1 and 2 both add up to be the distance between point 2 and 1
         //then the point is on the line
-        if (distance1 + distance2 == distance3){
-            return true;
-        } else{
-            return false;
-        }
+        return distance1 + distance2 == distance3;
 
     }
 
