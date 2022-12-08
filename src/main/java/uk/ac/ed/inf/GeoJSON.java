@@ -10,7 +10,7 @@ import java.util.Vector;
 
 public class GeoJSON {
     // Method which takes Vector of LngLat and writes it to a geojson file
-    public static void generateGeoJson(String filename, Vector<LngLat> path) {
+    public static String generateGeoJson(Vector<LngLat> path) {
         // Initialise a List of Points type used by geojson
         List<Point> points = new ArrayList<>();
         // Loop through the path, convert each LngLat to a Point and add it to the List
@@ -26,19 +26,9 @@ public class GeoJSON {
 
         // Convert the FeatureCollection to a String
         String geoJson = featureCollection.toJson();
-        // call writeGeoJson
-        writegeojson(filename, geoJson);
-    }
-    // given geojson string write to file
-    public static void writegeojson(String filename, String geoJson) {
-        // Write to file with try and catch exception
-        try {
-            FileWriter file = new FileWriter(filename);
-            file.write(geoJson);
-            file.close();
-        } catch (Exception e) {
-            System.out.println("Error writing to file");
-        }
+
+        return geoJson;
+
     }
 
 }

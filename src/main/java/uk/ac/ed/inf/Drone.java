@@ -198,7 +198,7 @@ public class Drone {
                 try {
                     FileHandler.writeFlightpathJSONs(orderNo, from, to, angle, ticksFromStart);
                 } catch(JsonProcessingException e){
-                    System.out.println("Error processing flightpath JSON.");
+                    System.err.println("Error processing flightpath JSON.");
                 }
 
             }
@@ -206,9 +206,39 @@ public class Drone {
             try {
                 FileHandler.writeFlightPath(orders[0].orderDate);
             } catch(IOException e){
-                System.out.println("Error writing flightpath output file.");
+                System.err.println("Error writing flightpath output file.");
             }
 
+        }
+
+    }
+
+    private static void recordDronePath(String date){
+
+        //put all the LngLats in the moves into a single ArrayList<LngLat>
+        ArrayList<LngLat> lngLats = new ArrayList<>();
+
+        for (ArrayList<AStarEntry> entry : dayOrderMoves.values()){
+
+            if (entry == null){
+                continue;
+            }
+
+            for (AStarEntry move : entry){
+                if (move.getCoords() == null){
+                    continue;
+                }
+                lngLats.add(move.getCoords());
+            }
+
+        }
+
+        Vector<LngLat> lngLatVector = new Vector<LngLat>(lngLats);
+
+        try {
+            FileHandler.writeDronePath(date, lngLatVector);
+        } catch (IOException e){
+            System.err.println("Error writing drone path output file.");
         }
 
     }
@@ -257,8 +287,9 @@ public class Drone {
         try{
             writeDeliveriesJSONs(date);
             recordMovements();
+            recordDronePath(date);
         } catch (IOException e){
-            System.out.println("Error writing deliveries to file.");
+            System.err.println("Error writing deliveries to file.");
         }
 
     }

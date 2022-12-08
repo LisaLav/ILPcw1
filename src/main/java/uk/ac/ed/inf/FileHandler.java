@@ -3,12 +3,12 @@ package uk.ac.ed.inf;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import uk.ac.ed.inf.enums.CompassDirection;
 import uk.ac.ed.inf.records.LngLat;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Vector;
 
 public class FileHandler {
 
@@ -81,9 +81,16 @@ public class FileHandler {
 
     }
 
-    public static void writeDronePath(String date){
+    public static void writeDronePath(String date, Vector<LngLat> geojson) throws IOException {
 
-        String filename = "drone-" + date
+        String filename = "drone-" + date + ".geojson";
+
+        FileWriter fileWriter = new FileWriter(filename);
+
+        String content = GeoJSON.generateGeoJson(geojson);
+
+        fileWriter.write(content);
+        fileWriter.close();
 
     }
 

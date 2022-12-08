@@ -27,7 +27,7 @@ public class App
             restUrl = args[1];
             hash = args[2];
         } catch (ArrayIndexOutOfBoundsException e){
-            System.out.println("Not enough arguments put in");
+            System.err.println("Not enough arguments put in");
             exit(1);
         }
 
@@ -36,20 +36,20 @@ public class App
         if (validUrl(restUrl)){
             RESTUrl.getInstance(restUrl);
         } else{
-            System.out.println("REST url is not a valid url");
+            System.err.println("REST url is not a valid url");
             exit(1);
         }
 
         //ensure date is valid
         if (convertDate(date) == null){
-            System.out.println("Invalid date put in. Format is YYYY-MM-DD");
+            System.err.println("Invalid date put in. Format is YYYY-MM-DD");
             exit(1);
         }
 
         try {
             Drone.StartDay(date);
         } catch (MalformedURLException e){
-            System.out.println("Malformed URL Excpetion when starting Drone");
+            System.err.println("Malformed URL Exception when starting Drone");
             exit(1);
         }
 
