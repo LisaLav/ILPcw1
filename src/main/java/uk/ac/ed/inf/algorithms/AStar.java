@@ -108,7 +108,6 @@ public class AStar {
         HashMap<LngLat, Double> fScore = new HashMap<>();
         ArrayList<LngLat> closedNodes = new ArrayList<>();
         AStarEntry startEntry = new AStarEntry(start, 0.0, null, Clock.tick(clock, Duration.ofMillis(1)).instant(), null);
-        System.out.println(Clock.tick(clock, Duration.ofMillis(1)).instant().getNano());
 
         //variables to ensure path doesn't go over no-fly zones or into central area too many times
         NoFlyZoneJSON[] noFlyZone = Drone.getNoFlyZones();

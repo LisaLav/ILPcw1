@@ -65,6 +65,7 @@ public class FileHandler {
         String flightpathArray = flightpath.toString();
 
         fileWriter.write(flightpathArray);
+        fileWriter.close();
 
 
     }
@@ -81,6 +82,8 @@ public class FileHandler {
     }
 
     public static void writeDronePath(String date){
+
+        String filename = "drone-" + date
 
     }
 

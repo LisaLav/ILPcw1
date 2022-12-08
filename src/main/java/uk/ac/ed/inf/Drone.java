@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import uk.ac.ed.inf.algorithms.AStar;
 import uk.ac.ed.inf.algorithms.AStarEntry;
-import uk.ac.ed.inf.enums.CompassDirection;
 import uk.ac.ed.inf.enums.OrderOutcome;
 import uk.ac.ed.inf.jsons.JSONPoint;
 import uk.ac.ed.inf.jsons.NoFlyZoneJSON;
@@ -149,6 +148,9 @@ public class Drone {
 
     private static void recordMovements(){
 
+        //this is to help keep track when the drone has made its final movements
+        int internalBattery = 2000;
+
         //loop through each of the orders from today and record each of the movements the drone made
         for (int i = 0; i < orders.length; i++){
 
@@ -162,17 +164,17 @@ public class Drone {
                 continue;
             }
 
-            //System.out.println(path.size());
+            internalBattery = internalBattery - path.size();
 
             //and now loop through all the movements in the path and record it
-            for (int j = 0; j < path.size()-1; j = j+2){
+            for (int j = 1; j < path.size(); j++){
 
-                LngLat from = path.get(j).getCoords();
-                LngLat to = path.get(j+1).getCoords();
+                LngLat from = path.get(j-1).getCoords();
+                LngLat to = path.get(j).getCoords();
 
-                //if to is null then the drone is hovering, so can't get degree
-                if (to != null) {
-                    angle = path.get(j+1).getAngle().getDegree();
+                //if getAngle is null then the drone is hovering, so can't get degree
+                if (path.get(j).getAngle() != null) {
+                    angle = path.get(j).getAngle().getDegree();
 
                     //this checks if we're going back to Appleton Tower or not
                     if (j >= (path.size()/2)-1){
@@ -184,12 +186,13 @@ public class Drone {
                     angle = null;
                 }
 
-                //this checks if we're going back to Appleton Tower or not
-                if (j >= (path.size()/2)-1){
+                //this checks if we're going back to Appleton Tower or not for the final drone flight path
+                //which works as the orders are ordered by shortest path to longest, so if reducing it by the current path size again makes it < 0 then it's the final order
+                if ((internalBattery - path.size() < 0) && (j >= (path.size()/2)-1)){
                     orderNo = "no-order";
                 }
 
-                ticksFromStart = path.get(j).getTimeToCompute().getNano() - timeWhenStarted;
+                ticksFromStart = path.get(j-1).getTimeToCompute().getNano() - timeWhenStarted;
 
 
                 try {
@@ -208,22 +211,6 @@ public class Drone {
 
         }
 
-        /*LngLat fromLngLat = from.getCoords();
-        LngLat toLngLat = null;
-        CompassDirection angle = null;
-        int ticksSinceStart = 0;
-        if (to != null) {
-            toLngLat = to.getCoords();
-            angle = to.getAngle();
-            ticksSinceStart = to.getTimeToCompute().getNano();
-        }
-
-        try {
-            FileHandler.writeFlightpathJSONs(orderNo, fromLngLat, toLngLat, angle, ticksSinceStart);
-        } catch (JsonProcessingException e){
-            System.out.println("Error processing JSON in AStar recordMovements.");
-        }*/
-
     }
 
     public static void StartDay(String date) throws MalformedURLException {
@@ -235,7 +222,6 @@ public class Drone {
         OrderOutcome currentOrderOutcome = null;
         ArrayList<AStarEntry> currentMoves = null;
         timeWhenStarted = Clock.tick(clock, Duration.ofMillis(1)).instant().getNano();
-        System.out.println(timeWhenStarted);
 
         orderOrdersByDistance();
 
@@ -255,7 +241,7 @@ public class Drone {
             currentMoves = calculateMoves(currentOrder);
 
             //the drone must move to the restaurant and back again
-            battery = battery - currentMoves.size()*2;
+            battery = battery - currentMoves.size();
 
             //if the current order makes the battery go into negative values, then we have to stop as the battery has run out
             if (battery < 0){
